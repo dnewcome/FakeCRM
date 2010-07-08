@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using Microsoft.Crm.Sdk.Query;
 
 namespace Djn.Codegen
 {
-	class DummyCrmService : ICrmService
+	class MockCrmService : ICrmService
 	{
 		private Dictionary<string, List<BusinessEntity>> data = 
 			new Dictionary<string, List<BusinessEntity>>();
@@ -66,7 +67,7 @@ namespace Djn.Codegen
 			BusinessEntityCollection retval = new BusinessEntityCollection();
 			if( data.ContainsKey( query.EntityName ) ) {
 				foreach( BusinessEntity entity in data[ query.EntityName ] ) {
-					if( true == EvaluateFilters( queryExpression.Criteria, entity ) ) {
+					if( true == EvaluateFilters( queryExpression.Criteria, entity ) && true == EvaluateLinks( queryExpression.LinkEntities, entity ) ) {
 						retval.BusinessEntities.Add( entity );
 					}
 				}
@@ -80,6 +81,32 @@ namespace Djn.Codegen
 
 		public void Dispose() {
 			throw new NotImplementedException();
+		}
+
+		// I wonder why they used an arraylist instead of List<LinkEntity>
+		// TODO: The api is not clear here, should we be returning bool or 
+		private bool EvaluateLinks( ArrayList in_links, BusinessEntity in_entity ) {
+			foreach( LinkEntity link in in_links ) {
+				foreach( BusinessEntity entity in data[ link.LinkToEntityName ] ) {
+					object linkFromFieldValue = in_entity.GetType().GetProperty( link.LinkFromAttributeName ).GetValue( in_entity, null );	
+					object linkToFieldValue = entity.GetType().GetProperty( link.LinkToAttributeName ).GetValue( entity, null );
+					// TODO: are we passing the correct entity here? - do we need access to both entities to eval 
+					// these criteria? Somehow I don't think so, since otherwise why would we need LinkEntity
+					// TODO: we only support inner join. CRM supports left outer and natural joins.
+					// TODO: how do we handle other comparisons that aren't Key == Lookup?
+					try { // Huge hack since we try to get Value of field that may be null
+						if( ( ( Key )linkFromFieldValue ).Value == ( ( Lookup )linkToFieldValue ).Value
+							&& EvaluateFilters( link.LinkCriteria, entity ) == true ) {
+							// We short circuit - as long as one linked entity meets the criteria, we'll return true
+							return true;
+						}
+					}
+					catch { }
+				}
+				// TODO: eval nested links
+				// EvaluateLinks( link.LinkEntities );
+			}
+			return false;
 		}
 
 		private bool EvaluateFilters( FilterExpression in_filter, BusinessEntity in_entity ) {
