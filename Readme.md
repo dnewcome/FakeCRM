@@ -1,5 +1,5 @@
 this is an implementation of ICrmService that does not persist data to disk
-or database. It is able to do simple queries, but no link entities.
+or database. It is able to do simple queries, and single entity links.
 
 Only string equality comparisons are possible currently - no other data types
 or comparison operators are supported. Note that there are a lot of operators,
