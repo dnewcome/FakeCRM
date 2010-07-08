@@ -6,28 +6,30 @@ using System.Text;
 using Microsoft.Crm.Sdk;
 using Microsoft.Crm.Sdk.Query;
 
-namespace Djn.Codegen
+namespace Djn.Testing
 {
-	public class MockCrmService : ICrmService
+	public partial class MockCrmService : ICrmService
 	{
+		/*
 		private Dictionary<string, List<BusinessEntity>> data = 
 			new Dictionary<string, List<BusinessEntity>>();
-
+		*/
 		public Guid Create( BusinessEntity entity ) {
 			Guid id = Guid.NewGuid();
 			string name = entity.GetType().Name;
 			if( name == "DynamicEntity" ) {
 				DynamicEntity de = ( DynamicEntity )entity;
-				data[ de.Name ].Add( entity );
 				de.Properties.Add( new KeyProperty( de.Name + "id", new Key( id ) ) );
 			}
 			else {
 				entity.GetType().GetProperty( name + "id" ).SetValue( entity, new Key( id ), null );
 				if( data.ContainsKey( name ) == false ) {
-					data.Add( name, new List<BusinessEntity>() );
+					// change to accommodate the new list type - commented out to change back if needed
+					// data.Add( name, new List<BusinessEntity>() );
+					data.Add( name, new BusinessEntityList() );
 				}
-				data[ name ].Add( entity );
 			}
+			data[ name ].Add( entity );
 			return id;
 		}
 

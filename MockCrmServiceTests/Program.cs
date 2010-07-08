@@ -6,14 +6,13 @@ using Microsoft.Crm.Sdk;
 using Microsoft.Crm.Sdk.Query;
 using Microsoft.Crm.SdkTypeProxy;
 
-namespace Djn.Codegen
+namespace Djn.Testing
 {
 	class Program
 	{
-		public static ICrmService m_service;
+		public static MockCrmService m_service = new MockCrmService();
  
 		public static void Setup() {
-			m_service = new MockCrmService();
 			contact contact = new contact();
 			contact.address1_name = "Dan";
 			contact.address1_city = "Bethesda";
@@ -63,13 +62,24 @@ namespace Djn.Codegen
 			Console.WriteLine( "TestLinks() found: " + bec.BusinessEntities.Count + " entity. " );
 		}
 
+		public static void TestRetrieve() {
+			contact be = ( contact )m_service.Retrieve( "contact", new Guid( "c47af6bb-2f51-4c80-bd04-9d7364d022e3" ), new AllColumns() );
+			Console.WriteLine( "TestRetrieve() found: " + be.address1_name );
+		}
+
 		public static void Main() {
 		
 			// TODO: add test for delete back
 			// service.Delete( "contact", id );
-			Setup();
+
+			// test file read instead of setup
+			// Setup();
+			m_service.ReadFromDisk();
+
 			TestLinks();
 			TestFilters();
+			TestRetrieve();
+			// m_service.PersistToDisk();
 			Console.ReadLine();
 
 		}

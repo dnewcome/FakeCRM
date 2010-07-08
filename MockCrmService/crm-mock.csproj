@@ -102,7 +102,10 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BusinessEntityList.cs" />
     <Compile Include="MockCrmService.cs" />
+    <Compile Include="MockCrmServiceExperimental.cs" />
+    <Compile Include="SerializableDictionary.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
