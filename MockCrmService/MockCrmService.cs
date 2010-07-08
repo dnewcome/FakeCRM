@@ -8,7 +8,7 @@ using Microsoft.Crm.Sdk.Query;
 
 namespace Djn.Codegen
 {
-	class MockCrmService : ICrmService
+	public class MockCrmService : ICrmService
 	{
 		private Dictionary<string, List<BusinessEntity>> data = 
 			new Dictionary<string, List<BusinessEntity>>();
