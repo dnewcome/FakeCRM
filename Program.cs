@@ -43,7 +43,7 @@ namespace Djn.Codegen
 			qe.Criteria = fe;
 
 			BusinessEntityCollection bec = m_service.RetrieveMultiple( qe );
-			Console.WriteLine( bec.BusinessEntities.Count );
+			Console.WriteLine( "TestFilters() found: " + bec.BusinessEntities.Count + " entity. " );
 		}
 
 		public static void TestLinks() {
@@ -60,7 +60,7 @@ namespace Djn.Codegen
 			
 
 			BusinessEntityCollection bec = m_service.RetrieveMultiple( qe );
-			Console.WriteLine( bec.BusinessEntities.Count );
+			Console.WriteLine( "TestLinks() found: " + bec.BusinessEntities.Count + " entity. " );
 		}
 
 		public static void Main() {
@@ -69,6 +69,7 @@ namespace Djn.Codegen
 			// service.Delete( "contact", id );
 			Setup();
 			TestLinks();
+			TestFilters();
 			Console.ReadLine();
 
 		}

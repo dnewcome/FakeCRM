@@ -83,9 +83,10 @@ namespace Djn.Codegen
 			throw new NotImplementedException();
 		}
 
-		// I wonder why they used an arraylist instead of List<LinkEntity>
-		// TODO: The api is not clear here, should we be returning bool or 
 		private bool EvaluateLinks( ArrayList in_links, BusinessEntity in_entity ) {
+			// TODO: can we restructure things to avoid this check?
+			if( in_links.Count == 0 ) return true;
+
 			foreach( LinkEntity link in in_links ) {
 				foreach( BusinessEntity entity in data[ link.LinkToEntityName ] ) {
 					object linkFromFieldValue = in_entity.GetType().GetProperty( link.LinkFromAttributeName ).GetValue( in_entity, null );	
@@ -98,6 +99,7 @@ namespace Djn.Codegen
 						if( ( ( Key )linkFromFieldValue ).Value == ( ( Lookup )linkToFieldValue ).Value
 							&& EvaluateFilters( link.LinkCriteria, entity ) == true ) {
 							// We short circuit - as long as one linked entity meets the criteria, we'll return true
+							// TODO: this is a bug - we don't eval all links.
 							return true;
 						}
 					}
