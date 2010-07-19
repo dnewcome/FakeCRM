@@ -13,7 +13,7 @@
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <ProjectGuid>{561CF9B5-9A64-41EC-9616-1AD63F840B1A}</ProjectGuid>
     <PublishUrl>publish\</PublishUrl>
@@ -30,6 +30,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,6 +52,12 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CrmQuery">
+      <HintPath>..\..\CrmQuery\CrmQuery\bin\Debug\CrmQuery.dll</HintPath>
+    </Reference>
+    <Reference Include="Fest">
+      <HintPath>..\..\..\assemblycache\Fest\0.2.0.0\3.5\Release\Fest.dll</HintPath>
+    </Reference>
     <Reference Include="microsoft.crm.sdk, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\sandbox\mbs\assemblycache\Microsoft.Crm.Sdk\4.0.12\64bit\microsoft.crm.sdk.dll</HintPath>
@@ -106,6 +113,17 @@
       <Project>{A2BDEA9B-547E-4FCC-9771-593EFA72B61A}</Project>
       <Name>crm-mock</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="database.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="mockdata.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

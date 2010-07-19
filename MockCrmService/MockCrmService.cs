@@ -4,31 +4,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Crm.Sdk;
+using Microsoft.Crm.SdkTypeProxy;
 using Microsoft.Crm.Sdk.Query;
 
 namespace Djn.Testing
 {
 	public partial class MockCrmService : ICrmService
 	{
-		/*
-		private Dictionary<string, List<BusinessEntity>> data = 
-			new Dictionary<string, List<BusinessEntity>>();
-		*/
+		public MockCrmService( string in_filename ) {
+			ReadFromDisk( in_filename );
+		}
+		public MockCrmService() { }
+
 		public Guid Create( BusinessEntity entity ) {
 			Guid id = Guid.NewGuid();
+			
 			string name = entity.GetType().Name;
+			if( data.ContainsKey( name ) == false ) {
+				data.Add( name, new BusinessEntityList() );
+			}
+
 			if( name == "DynamicEntity" ) {
 				DynamicEntity de = ( DynamicEntity )entity;
 				de.Properties.Add( new KeyProperty( de.Name + "id", new Key( id ) ) );
 			}
 			else {
 				entity.GetType().GetProperty( name + "id" ).SetValue( entity, new Key( id ), null );
-				if( data.ContainsKey( name ) == false ) {
-					// change to accommodate the new list type - commented out to change back if needed
-					// data.Add( name, new List<BusinessEntity>() );
-					data.Add( name, new BusinessEntityList() );
-				}
 			}
+
 			data[ name ].Add( entity );
 			return id;
 		}
@@ -45,7 +48,14 @@ namespace Djn.Testing
 		}
 
 		public object Execute( object request ) {
-			throw new NotImplementedException();
+			if( request.GetType().Name == "RetrieveMultipleRequest" ) {
+				RetrieveMultipleResponse response = new RetrieveMultipleResponse();
+				response.BusinessEntityCollection = RetrieveMultiple( ( ( RetrieveMultipleRequest )request ).Query );
+				return response;
+			}
+			else {
+				throw new NotImplementedException();
+			}
 		}
 
 		public string Fetch( string fetchXml ) {
@@ -91,8 +101,23 @@ namespace Djn.Testing
 
 			foreach( LinkEntity link in in_links ) {
 				foreach( BusinessEntity entity in data[ link.LinkToEntityName ] ) {
-					object linkFromFieldValue = in_entity.GetType().GetProperty( link.LinkFromAttributeName ).GetValue( in_entity, null );	
-					object linkToFieldValue = entity.GetType().GetProperty( link.LinkToAttributeName ).GetValue( entity, null );
+
+					// TODO: we do this check and value retrieval in both filters and links handing
+					// TODO: we assume that both ends of the link are either DynamicEntity or not
+					object linkFromFieldValue = null;
+					object linkToFieldValue = null;
+					try { // another hack, since some entities will have null on the field we are linking
+						if( entity.GetType().Name == "DynamicEntity" ) {
+							// TODO: we only support StringProperty here
+							linkFromFieldValue = ( ( DynamicEntity )in_entity ).Properties[ link.LinkFromAttributeName ];
+							linkToFieldValue = ( ( DynamicEntity )entity ).Properties[ link.LinkToAttributeName ];
+						}
+						else {
+							linkFromFieldValue = in_entity.GetType().GetProperty( link.LinkFromAttributeName ).GetValue( in_entity, null );
+							linkToFieldValue = entity.GetType().GetProperty( link.LinkToAttributeName ).GetValue( entity, null );
+						}
+					}
+					catch { }
 					// TODO: are we passing the correct entity here? - do we need access to both entities to eval 
 					// these criteria? Somehow I don't think so, since otherwise why would we need LinkEntity
 					// TODO: we only support inner join. CRM supports left outer and natural joins.
@@ -105,7 +130,17 @@ namespace Djn.Testing
 							return true;
 						}
 					}
-					catch { }
+					catch { /// HACK try it the other way
+						try {
+							if( ( ( Lookup )linkFromFieldValue ).Value == ( ( Key )linkToFieldValue ).Value
+								&& EvaluateFilters( link.LinkCriteria, entity ) == true ) {
+								// We short circuit - as long as one linked entity meets the criteria, we'll return true
+								// TODO: this is a bug - we don't eval all links.
+								return true;
+							}
+						}
+						catch { }
+					}
 				}
 				// TODO: eval nested links
 				// EvaluateLinks( link.LinkEntities );
@@ -121,10 +156,20 @@ namespace Djn.Testing
 			}
 			foreach( ConditionExpression exp in in_filter.Conditions ) {
 				bool result = true;
-				object fieldValue = in_entity.GetType().GetProperty( exp.AttributeName ).GetValue( in_entity, null );
+				object fieldValue;
+
+				// TODO: we do this check and value retrieval in both filters and links handing
+				if( in_entity.GetType().Name == "DynamicEntity" ) {
+					DynamicEntity entity = ( DynamicEntity )in_entity;
+					// TODO: we only support StringProperty here
+					fieldValue = entity.Properties[ exp.AttributeName ];
+				}
+				else {
+					fieldValue = in_entity.GetType().GetProperty( exp.AttributeName ).GetValue( in_entity, null );
+				}
 				if( exp.Operator == ConditionOperator.Equal ) {
 					foreach( object val in exp.Values ) {
-						if( val != fieldValue ) {
+						if( !val.Equals( fieldValue ) ) {
 							result = false;
 							break;
 						}

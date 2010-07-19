@@ -5,14 +5,16 @@ using System.Text;
 using Microsoft.Crm.Sdk;
 using Microsoft.Crm.Sdk.Query;
 using Microsoft.Crm.SdkTypeProxy;
+using Djn.Crm;
 
 namespace Djn.Testing
 {
 	class Program
 	{
-		public static MockCrmService m_service = new MockCrmService();
+		
  
-		public static void Setup() {
+		public static MockCrmService Setup() {
+			MockCrmService m_service = new MockCrmService();
 			contact contact = new contact();
 			contact.address1_name = "Dan";
 			contact.address1_city = "Bethesda";
@@ -26,11 +28,17 @@ namespace Djn.Testing
 			subject2.title = "child";
 			subject2.parentsubject = new Lookup( "subject", subject1ID );
 			m_service.Create( subject2 );
+
+			DynamicEntity de = new DynamicEntity();
+			de.Name = "mydynamic";
+			de.Properties.Add( new StringProperty( "prop1", "foo" ) );
+			Guid deID = m_service.Create( de );
+			return m_service;
 		}
 
 		public static void Teardown() { }
 
-		public static void TestFilters() {
+		public static void TestFilters( MockCrmService in_service ) {
 			ConditionExpression cond = new ConditionExpression( "address1_name", ConditionOperator.Equal, new string[] { "Dan" } );
 			ConditionExpression cond2 = new ConditionExpression( "address1_city", ConditionOperator.Equal, new string[] { "Bethesda" } );
 			FilterExpression fe = new FilterExpression();
@@ -41,11 +49,11 @@ namespace Djn.Testing
 			QueryExpression qe = new QueryExpression( "contact" );
 			qe.Criteria = fe;
 
-			BusinessEntityCollection bec = m_service.RetrieveMultiple( qe );
+			BusinessEntityCollection bec = in_service.RetrieveMultiple( qe );
 			Console.WriteLine( "TestFilters() found: " + bec.BusinessEntities.Count + " entity. " );
 		}
 
-		public static void TestLinks() {
+		public static void TestLinks( MockCrmService in_service ) {
 			ConditionExpression cond = new ConditionExpression( "title", ConditionOperator.Equal, new string[] { "child" } );
 			FilterExpression fe = new FilterExpression();
 			fe.FilterOperator = LogicalOperator.And;
@@ -58,34 +66,50 @@ namespace Djn.Testing
 			qe.LinkEntities.Add( le );
 			
 
-			BusinessEntityCollection bec = m_service.RetrieveMultiple( qe );
+			BusinessEntityCollection bec = in_service.RetrieveMultiple( qe );
 			Console.WriteLine( "TestLinks() found: " + bec.BusinessEntities.Count + " entity. " );
 		}
 
-		public static void TestRetrieve() {
-			contact be = ( contact )m_service.Retrieve( "contact", new Guid( "c47af6bb-2f51-4c80-bd04-9d7364d022e3" ), new AllColumns() );
+		// not sure where the guid here came from
+		public static void TestRetrieve( MockCrmService in_service ) {
+			contact be = ( contact )in_service.Retrieve( "contact", new Guid( "c47af6bb-2f51-4c80-bd04-9d7364d022e3" ), new AllColumns() );
 			Console.WriteLine( "TestRetrieve() found: " + be.address1_name );
 		}
 
 		public static void Main() {
-		
+			Fest.Run();
+			Console.ReadLine();
+		}
+
+		[FestTest]
+		public void TestMockData() {
+			MockCrmService serviceFromDisk = new MockCrmService( "mockdata.xml" );
+			QueryBase query = CrmQuery
+				.Select()
+				.From( "new_dynamicform" )
+				.Join( "new_dynamicform", "new_previousformid", "new_dynamicform", "new_dynamicformid" )
+				.Where( "new_dynamicform", "new_name", ConditionOperator.Equal, new object[] { "welcome" } ).Query;
+			BusinessEntityCollection bec = serviceFromDisk.RetrieveMultiple( query );
+			Console.WriteLine( "TestMockData() found: " + bec.BusinessEntities.Count + " entity. " );
+			Fest.AssertTrue( bec.BusinessEntities.Count > 0, "No business entities returned" );
+		}
+
+		// [FestTest]
+		public void Test1() {
 			// TODO: add test for delete back
 			// service.Delete( "contact", id );
 
-			// test file read instead of setup
-			// Setup();
-			m_service.ReadFromDisk();
-
-			TestLinks();
-			TestFilters();
-			TestRetrieve();
-			// m_service.PersistToDisk();
-			Console.ReadLine();
-
-		}
-
-		private static void Test1() { 
+			MockCrmService service = Setup();
+			MockCrmService serviceFromDisk = new MockCrmService( "database.xml" );
 			
+
+			TestLinks( service );
+			TestLinks( serviceFromDisk );
+			TestFilters( service );
+			TestFilters( serviceFromDisk );
+
+			// TestRetrieve();
+			// m_service.PersistToDisk( "database.xml" );
 		}
 	}
 }

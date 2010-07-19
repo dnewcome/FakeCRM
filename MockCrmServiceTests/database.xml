@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<dictionary>
+  <item>
+    <key>
+      <string>contact</string>
+    </key>
+    <value>
+      <ArrayOfBusinessEntity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <BusinessEntity xmlns:q1="http://schemas.microsoft.com/crm/2007/WebServices" xsi:type="q1:contact">
+          <q1:address1_city>Bethesda</q1:address1_city>
+          <q1:address1_name>Dan</q1:address1_name>
+          <q1:contactid>0e830282-7bc9-4a71-9745-6cd299632040</q1:contactid>
+        </BusinessEntity>
+      </ArrayOfBusinessEntity>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>subject</string>
+    </key>
+    <value>
+      <ArrayOfBusinessEntity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <BusinessEntity xmlns:q1="http://schemas.microsoft.com/crm/2007/WebServices" xsi:type="q1:subject">
+          <q1:subjectid>3222f002-7d58-4a06-b53d-06b90bd39514</q1:subjectid>
+          <q1:title>parent</q1:title>
+        </BusinessEntity>
+        <BusinessEntity xmlns:q2="http://schemas.microsoft.com/crm/2007/WebServices" xsi:type="q2:subject">
+          <q2:parentsubject type="subject">3222f002-7d58-4a06-b53d-06b90bd39514</q2:parentsubject>
+          <q2:subjectid>4abb624d-75cc-4322-b54e-2f01825ca877</q2:subjectid>
+          <q2:title>child</q2:title>
+        </BusinessEntity>
+      </ArrayOfBusinessEntity>
+    </value>
+  </item>
+  <item>
+    <key>
+      <string>DynamicEntity</string>
+    </key>
+    <value>
+      <ArrayOfBusinessEntity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <BusinessEntity xmlns:q1="http://schemas.microsoft.com/crm/2006/WebServices" xsi:type="q1:DynamicEntity" Name="mydynamic">
+          <q1:Properties>
+            <q1:Property xsi:type="q1:StringProperty" Name="prop1">
+              <q1:Value>foo</q1:Value>
+            </q1:Property>
+            <q1:Property xsi:type="q1:KeyProperty" Name="mydynamicid">
+              <q1:Value>ed084ee9-8aac-4266-9810-8041aad6789e</q1:Value>
+            </q1:Property>
+          </q1:Properties>
+        </BusinessEntity>
+      </ArrayOfBusinessEntity>
+    </value>
+  </item>
+</dictionary>

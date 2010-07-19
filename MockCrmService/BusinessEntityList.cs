@@ -10,6 +10,7 @@ namespace Djn.Testing
 {
 	[XmlInclude( typeof( contact ) )]
 	[XmlInclude( typeof( subject ) )]
+	[XmlInclude( typeof( DynamicEntity ) )]
 	public class BusinessEntityList : List<BusinessEntity>
 	{
 	}
