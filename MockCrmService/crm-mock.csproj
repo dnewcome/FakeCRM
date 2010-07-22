@@ -35,7 +35,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\$(strAssemblyFileVersion)-SNAPSHOT\$(TargetFrameworkVersion)\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -44,7 +44,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\$(strAssemblyFileVersion)-SNAPSHOT\$(TargetFrameworkVersion)\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -54,15 +54,11 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="microsoft.crm.sdk, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\sandbox\mbs\assemblycache\Microsoft.Crm.Sdk\4.0.12\64bit\microsoft.crm.sdk.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="microsoft.crm.sdk">
+      <HintPath>..\..\..\..\sandbox\mbs\assemblycache\Microsoft.Crm.Sdk\4.0.12\64bit\microsoft.crm.sdk.dll</HintPath>
     </Reference>
-    <Reference Include="microsoft.crm.sdktypeproxy, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\sandbox\mbs\assemblycache\Microsoft.Crm.Sdk\4.0.12\64bit\microsoft.crm.sdktypeproxy.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="microsoft.crm.sdktypeproxy">
+      <HintPath>..\..\..\..\sandbox\mbs\assemblycache\Microsoft.Crm.Sdk\4.0.12\64bit\microsoft.crm.sdktypeproxy.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -118,7 +114,8 @@
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
   -->
+  <Target Name="AfterBuild">
+		  <Exec Command='xcopy /E /Y bin $(ASSEMBLYCACHE)\$(AssemblyName)\' /> 
+  </Target>
 </Project>

@@ -6,12 +6,29 @@
     </key>
     <value>
       <ArrayOfBusinessEntity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-        <BusinessEntity xmlns:q1="http://schemas.microsoft.com/crm/2007/WebServices" xsi:type="q1:contact">
+        
+				<BusinessEntity xmlns:q1="http://schemas.microsoft.com/crm/2007/WebServices" xsi:type="q1:contact">
           <q1:address1_city>Bethesda</q1:address1_city>
           <q1:address1_name>Dan</q1:address1_name>
           <q1:contactid>0e830282-7bc9-4a71-9745-6cd299632040</q1:contactid>
         </BusinessEntity>
-      </ArrayOfBusinessEntity>
+
+				<!-- this entity is a DynamicEntity -->
+				<BusinessEntity xmlns:q1="http://schemas.microsoft.com/crm/2006/WebServices" xsi:type="q1:DynamicEntity" Name="contact">
+					<q1:Properties>
+						<q1:Property xsi:type="q1:StringProperty" Name="address1_city">
+							<q1:Value>Bethesda</q1:Value>
+						</q1:Property>
+						<q1:Property xsi:type="q1:StringProperty" Name="address1_name">
+							<q1:Value>Dan</q1:Value>
+						</q1:Property>
+						<q1:Property xsi:type="q1:KeyProperty" Name="contactid">
+							<q1:Value>6d746f8d-b837-4365-afa1-fcab8c0d12c5</q1:Value>
+						</q1:Property>
+					</q1:Properties>
+				</BusinessEntity>
+
+			</ArrayOfBusinessEntity>
     </value>
   </item>
   <item>

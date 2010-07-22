@@ -53,6 +53,21 @@ namespace Djn.Testing
 				response.BusinessEntityCollection = RetrieveMultiple( ( ( RetrieveMultipleRequest )request ).Query );
 				return response;
 			}
+			else if(request.GetType().Name == "RetrieveRequest" ) {
+				RetrieveResponse response = new RetrieveResponse();
+				RetrieveRequest retrieveRequest = ( RetrieveRequest )request;
+				TargetRetrieve target = retrieveRequest.Target;
+				if( target.GetType().Name == "TargetRetrieveDynamic" ) {
+					TargetRetrieveDynamic trd = ( TargetRetrieveDynamic )target;
+					response.BusinessEntity = Retrieve( trd.EntityName, trd.EntityId, retrieveRequest.ColumnSet );
+				}
+				else {
+						// request sent using a specific strongly-typed business entity
+						// rather than a DynamicEntity
+						throw new NotImplementedException();
+				}
+				return response;
+			}
 			else {
 				throw new NotImplementedException();
 			}
@@ -65,7 +80,16 @@ namespace Djn.Testing
 		// Note: we ignore columnset
 		public BusinessEntity Retrieve( string entityName, Guid id, Microsoft.Crm.Sdk.Query.ColumnSetBase columnSet ) {
 			foreach( BusinessEntity entity in data[ entityName ] ) {
-				Key key = ( Key )entity.GetType().GetProperty( entityName + "id" ).GetValue( entity, null );
+				// TODO: factor this check out to method	
+				Key key;
+				if( entity.GetType().Name == "DynamicEntity" ) {
+					DynamicEntity de = ( DynamicEntity )entity;
+					key = ( Key )de.Properties[ entityName + "id" ];
+				}
+				else {
+					// TODO: we guess at id field name - should look for Key field type instead
+					key = ( Key )entity.GetType().GetProperty( entityName + "id" ).GetValue( entity, null );
+				}
 				Guid keyID = key.Value;
 				if( keyID == id ) {
 					return entity;
@@ -158,7 +182,7 @@ namespace Djn.Testing
 				bool result = true;
 				object fieldValue;
 
-				// TODO: we do this check and value retrieval in both filters and links handing
+				// TODO: extract this fieldvalue retrieval into a method 
 				if( in_entity.GetType().Name == "DynamicEntity" ) {
 					DynamicEntity entity = ( DynamicEntity )in_entity;
 					// TODO: we only support StringProperty here
@@ -167,6 +191,7 @@ namespace Djn.Testing
 				else {
 					fieldValue = in_entity.GetType().GetProperty( exp.AttributeName ).GetValue( in_entity, null );
 				}
+
 				if( exp.Operator == ConditionOperator.Equal ) {
 					foreach( object val in exp.Values ) {
 						if( !val.Equals( fieldValue ) ) {

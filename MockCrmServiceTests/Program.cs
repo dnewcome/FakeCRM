@@ -70,10 +70,20 @@ namespace Djn.Testing
 			Console.WriteLine( "TestLinks() found: " + bec.BusinessEntities.Count + " entity. " );
 		}
 
-		// not sure where the guid here came from
-		public static void TestRetrieve( MockCrmService in_service ) {
-			contact be = ( contact )in_service.Retrieve( "contact", new Guid( "c47af6bb-2f51-4c80-bd04-9d7364d022e3" ), new AllColumns() );
+		[FestTest]
+		public static void TestRetrieve() {
+			MockCrmService serviceFromDisk = new MockCrmService( "database.xml" );
+			// guid is in the database.xml file
+			contact be = ( contact )serviceFromDisk.Retrieve( "contact", new Guid( "0e830282-7bc9-4a71-9745-6cd299632040" ), new AllColumns() );
 			Console.WriteLine( "TestRetrieve() found: " + be.address1_name );
+		}
+
+		[FestTest]
+		public static void TestRetrieveDynamic() {
+			MockCrmService serviceFromDisk = new MockCrmService( "database.xml" );
+			// guid is in the database.xml file
+			DynamicEntity de = ( DynamicEntity )serviceFromDisk.Retrieve( "contact", new Guid( "6d746f8d-b837-4365-afa1-fcab8c0d12c5" ), new AllColumns() );
+			Console.WriteLine( "TestRetrieveDynamic() found: " + de.Properties[ "address1_name" ] );
 		}
 
 		public static void Main() {
