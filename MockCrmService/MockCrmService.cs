@@ -194,9 +194,18 @@ namespace Djn.Testing
 
 				if( exp.Operator == ConditionOperator.Equal ) {
 					foreach( object val in exp.Values ) {
-						if( !val.Equals( fieldValue ) ) {
-							result = false;
-							break;
+						// TODO: handle other data types
+						if( fieldValue is Key ) {
+							if( !val.Equals( ( ( Key )fieldValue).Value ) ) {
+								result = false;
+								break;
+							}
+						}
+						else {
+							if( !val.Equals( fieldValue ) ) {
+								result = false;
+								break;
+							}
 						}
 					}
 				}
