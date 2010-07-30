@@ -11,9 +11,20 @@ namespace Djn.Testing
 {
 	public partial class MockCrmService : ICrmService
 	{
+		// configuration for whether we save changes to disk
+		private bool m_persist = false;
+		private string m_filename;
+
+		public MockCrmService( string in_filename, bool in_persist )
+			: this( in_filename ) {
+			m_persist = in_persist;
+		}
+
 		public MockCrmService( string in_filename ) {
+			m_filename = in_filename;
 			ReadFromDisk( in_filename );
 		}
+
 		public MockCrmService() { }
 
 		public Guid Create( BusinessEntity entity ) {
@@ -112,7 +123,25 @@ namespace Djn.Testing
 		}
 
 		public void Update( BusinessEntity entity ) {
-			throw new NotImplementedException();
+			// Only support DynamicEntities for now
+			DynamicEntity de = ( DynamicEntity )entity;
+			foreach( BusinessEntity previousEntity in data[ de.Name ] ) { 
+				// TODO: we assume id field is "entitynameid"
+				if( previousEntity is DynamicEntity
+					&& ( ( Key )( ( DynamicEntity )previousEntity ).Properties[ de.Name + "id" ] ).Value 
+					== ( ( Key )de.Properties[ de.Name + "id" ] ).Value
+				) {
+					foreach( Property prop in de.Properties ) {
+						( ( DynamicEntity )previousEntity ).Properties.Remove( prop.Name );
+						( ( DynamicEntity )previousEntity ).Properties.Add( prop );
+					}
+					break;
+				}
+			}
+			
+			if( m_persist ) {
+				PersistToDisk( m_filename );
+			}
 		}
 
 		public void Dispose() {

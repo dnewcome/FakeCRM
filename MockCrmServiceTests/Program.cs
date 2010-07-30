@@ -92,6 +92,18 @@ namespace Djn.Testing
 		}
 
 		[FestTest]
+		public void TestUpdate() {
+			MockCrmService serviceFromDisk = new MockCrmService( "database.xml", true );
+			DynamicEntity de = new DynamicEntity( "contact" );
+			de.Properties.Add( new KeyProperty( "contactid", new Key( new Guid( "6d746f8d-b837-4365-afa1-fcab8c0d12c5" ) ) ) );
+			de.Properties.Add( new StringProperty( "address1_name", "Susan" ) );
+			serviceFromDisk.Update( de );
+
+			DynamicEntity de2 = ( DynamicEntity )serviceFromDisk.Retrieve( "contact", new Guid( "6d746f8d-b837-4365-afa1-fcab8c0d12c5" ), new AllColumns() );
+			Fest.AssertTrue( ( String )de2.Properties[ "address1_name" ] == "Susan", "Field value was not updated" );
+		}
+
+		[FestTest]
 		public void TestMockData() {
 			MockCrmService serviceFromDisk = new MockCrmService( "mockdata.xml" );
 			QueryBase query = CrmQuery
