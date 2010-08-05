@@ -103,12 +103,6 @@
     <Compile Include="MockCrmServiceExperimental.cs" />
     <Compile Include="SerializableDictionary.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\sandbox\mbs\Djn.Framework\Djn.Framework.csproj">
-      <Project>{F4E1CF02-D973-422C-AC1B-EDC90B6D5216}</Project>
-      <Name>Djn.Framework</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -116,6 +110,6 @@
   </Target>
   -->
   <Target Name="AfterBuild">
-		  <Exec Command='xcopy /E /Y bin $(ASSEMBLYCACHE)\$(AssemblyName)\' /> 
+    <Exec Command="xcopy /E /Y bin $(ASSEMBLYCACHE)\$(AssemblyName)\" />
   </Target>
 </Project>
