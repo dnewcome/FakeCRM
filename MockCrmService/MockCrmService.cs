@@ -44,6 +44,11 @@ namespace Djn.Testing
 			}
 
 			data[ name ].Add( entity );
+
+			if( m_persist ) {
+				PersistToDisk( m_filename );
+			}
+
 			return id;
 		}
 
@@ -55,6 +60,10 @@ namespace Djn.Testing
 					data[ entityName ].Remove( entity );
 					break;
 				}
+			}
+
+			if( m_persist ) {
+				PersistToDisk( m_filename );
 			}
 		}
 
