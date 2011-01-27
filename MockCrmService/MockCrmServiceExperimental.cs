@@ -12,20 +12,20 @@ namespace Djn.Testing
 	public partial class MockCrmService
 	{
 		// TODO: should we be using DynamicEntityCollection?
-		private SerializableDictionary<string, BusinessEntityList> data =
-		new SerializableDictionary<string, BusinessEntityList>();
+		private SerializableDictionary<string, BusinessEntityCollection> data =
+		new SerializableDictionary<string, BusinessEntityCollection>();
 	
 		public void PersistToDisk( string in_filename ) {
-			Type type = typeof( SerializableDictionary<string, BusinessEntityList> );
+			Type type = typeof( SerializableDictionary<string, BusinessEntityCollection> );
 			FileStream fs = new FileStream( in_filename, FileMode.Create, FileAccess.Write );
 			Serializer.Serialize( type, data, fs );
 			fs.Close();
 		}
 
 		public void ReadFromDisk( string in_filename ) {
-			Type type = typeof( SerializableDictionary<string, BusinessEntityList> );
+			Type type = typeof( SerializableDictionary<string, BusinessEntityCollection> );
 			FileStream fs = new FileStream( in_filename, FileMode.Open, FileAccess.Read );
-			data = ( SerializableDictionary<string, BusinessEntityList> )Serializer.Deserialize( type, fs );
+			data = ( SerializableDictionary<string, BusinessEntityCollection> )Serializer.Deserialize( type, fs );
 			fs.Close();
 		}
 

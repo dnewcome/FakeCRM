@@ -32,18 +32,23 @@ namespace Djn.Testing
 			
 			string name = entity.GetType().Name;
 			if( data.ContainsKey( name ) == false ) {
-				data.Add( name, new BusinessEntityList() );
+				data.Add( name, new BusinessEntityCollection() );
 			}
 
 			if( name == "DynamicEntity" ) {
 				DynamicEntity de = ( DynamicEntity )entity;
+				name = de.Name;
 				de.Properties.Add( new KeyProperty( de.Name + "id", new Key( id ) ) );
 			}
 			else {
 				entity.GetType().GetProperty( name + "id" ).SetValue( entity, new Key( id ), null );
 			}
 
-			data[ name ].Add( entity );
+
+			if( !data.ContainsKey( name ) ) {
+				data[ name ] = new BusinessEntityCollection();
+			}
+			data[ name ].BusinessEntities.Add( entity );
 
 			if( m_persist ) {
 				PersistToDisk( m_filename );
@@ -53,11 +58,11 @@ namespace Djn.Testing
 		}
 
 		public void Delete( string entityName, Guid id ) {
-			foreach( BusinessEntity entity in data[ entityName ] ) {
+			foreach( BusinessEntity entity in data[ entityName ].BusinessEntities ) {
 				Key key = ( Key )entity.GetType().GetProperty( entityName + "id" ).GetValue( entity, null );
 				Guid keyID = key.Value;
 				if( keyID == id ) {
-					data[ entityName ].Remove( entity );
+					data[ entityName ].BusinessEntities.Remove( entity );
 					break;
 				}
 			}
@@ -99,7 +104,7 @@ namespace Djn.Testing
 
 		// Note: we ignore columnset
 		public BusinessEntity Retrieve( string entityName, Guid id, Microsoft.Crm.Sdk.Query.ColumnSetBase columnSet ) {
-			foreach( BusinessEntity entity in data[ entityName ] ) {
+			foreach( BusinessEntity entity in data[ entityName ].BusinessEntities ) {
 				// TODO: factor this check out to method	
 				Key key;
 				if( entity.GetType().Name == "DynamicEntity" ) {
@@ -122,7 +127,7 @@ namespace Djn.Testing
 			QueryExpression queryExpression = ( QueryExpression )query;
 			BusinessEntityCollection retval = new BusinessEntityCollection();
 			if( data.ContainsKey( query.EntityName ) ) {
-				foreach( BusinessEntity entity in data[ query.EntityName ] ) {
+				foreach( BusinessEntity entity in data[ query.EntityName ].BusinessEntities ) {
 					if( true == EvaluateFilters( queryExpression.Criteria, entity ) && true == EvaluateLinks( queryExpression.LinkEntities, entity ) ) {
 						retval.BusinessEntities.Add( entity );
 					}
@@ -134,7 +139,7 @@ namespace Djn.Testing
 		public void Update( BusinessEntity entity ) {
 			// Only support DynamicEntities for now
 			DynamicEntity de = ( DynamicEntity )entity;
-			foreach( BusinessEntity previousEntity in data[ de.Name ] ) { 
+			foreach( BusinessEntity previousEntity in data[ de.Name ].BusinessEntities ) { 
 				// TODO: we assume id field is "entitynameid"
 				if( previousEntity is DynamicEntity
 					&& ( ( Key )( ( DynamicEntity )previousEntity ).Properties[ de.Name + "id" ] ).Value 
@@ -162,7 +167,7 @@ namespace Djn.Testing
 			if( in_links.Count == 0 ) return true;
 
 			foreach( LinkEntity link in in_links ) {
-				foreach( BusinessEntity entity in data[ link.LinkToEntityName ] ) {
+				foreach( BusinessEntity entity in data[ link.LinkToEntityName ].BusinessEntities ) {
 
 					// TODO: we do this check and value retrieval in both filters and links handing
 					// TODO: we assume that both ends of the link are either DynamicEntity or not

@@ -101,7 +101,6 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BusinessEntityList.cs" />
     <Compile Include="MockCrmService.cs" />
     <Compile Include="MockCrmServiceExperimental.cs" />
     <Compile Include="SerializableDictionary.cs" />

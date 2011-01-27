@@ -113,9 +113,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Copy of database.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="database.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -11,10 +11,10 @@ namespace Djn.Testing
 {
 	class Program
 	{
-		
- 
-		public static MockCrmService Setup() {
-			MockCrmService m_service = new MockCrmService();
+		MockCrmService m_service;
+
+		public Program() {
+			m_service = new MockCrmService();
 			contact contact = new contact();
 			contact.address1_name = "Dan";
 			contact.address1_city = "Bethesda";
@@ -33,12 +33,10 @@ namespace Djn.Testing
 			de.Name = "mydynamic";
 			de.Properties.Add( new StringProperty( "prop1", "foo" ) );
 			Guid deID = m_service.Create( de );
-			return m_service;
 		}
 
-		public static void Teardown() { }
-
-		public static void TestFilters( MockCrmService in_service ) {
+		[FestTest]
+		public void TestFilters() {
 			ConditionExpression cond = new ConditionExpression( "address1_name", ConditionOperator.Equal, new string[] { "Dan" } );
 			ConditionExpression cond2 = new ConditionExpression( "address1_city", ConditionOperator.Equal, new string[] { "Bethesda" } );
 			FilterExpression fe = new FilterExpression();
@@ -49,11 +47,13 @@ namespace Djn.Testing
 			QueryExpression qe = new QueryExpression( "contact" );
 			qe.Criteria = fe;
 
-			BusinessEntityCollection bec = in_service.RetrieveMultiple( qe );
+			BusinessEntityCollection bec = m_service.RetrieveMultiple( qe );
 			Console.WriteLine( "TestFilters() found: " + bec.BusinessEntities.Count + " entity. " );
+			Fest.AssertTrue( bec.BusinessEntities.Count > 0, "found more than zero entities" );
 		}
 
-		public static void TestLinks( MockCrmService in_service ) {
+		[FestTest]
+		public void TestLinks() {
 			ConditionExpression cond = new ConditionExpression( "title", ConditionOperator.Equal, new string[] { "child" } );
 			FilterExpression fe = new FilterExpression();
 			fe.FilterOperator = LogicalOperator.And;
@@ -64,74 +64,27 @@ namespace Djn.Testing
 
 			QueryExpression qe = new QueryExpression( "subject" );
 			qe.LinkEntities.Add( le );
-			
 
-			BusinessEntityCollection bec = in_service.RetrieveMultiple( qe );
+			BusinessEntityCollection bec = m_service.RetrieveMultiple( qe );
 			Console.WriteLine( "TestLinks() found: " + bec.BusinessEntities.Count + " entity. " );
+			Fest.AssertTrue( bec.BusinessEntities.Count > 0, "found more than zero entities" );
 		}
 
 		[FestTest]
-		public static void TestRetrieve() {
-			MockCrmService serviceFromDisk = new MockCrmService( "database.xml" );
-			// guid is in the database.xml file
-			contact be = ( contact )serviceFromDisk.Retrieve( "contact", new Guid( "0e830282-7bc9-4a71-9745-6cd299632040" ), new AllColumns() );
-			Console.WriteLine( "TestRetrieve() found: " + be.address1_name );
+		public void TestDynamic() {
+			QueryBase query = Djn.Crm.CrmQuery
+				.Select()
+				.From( "mydynamic" )
+				.Where( "mydynamic", "prop1", ConditionOperator.Equal, new object[] { "foo" } ).Query;
+
+			BusinessEntityCollection bec = m_service.RetrieveMultiple( query );
+			Fest.AssertTrue( bec.BusinessEntities.Count > 0, "found more than zero entities" );
 		}
 
-		[FestTest]
-		public static void TestRetrieveDynamic() {
-			MockCrmService serviceFromDisk = new MockCrmService( "database.xml" );
-			// guid is in the database.xml file
-			DynamicEntity de = ( DynamicEntity )serviceFromDisk.Retrieve( "contact", new Guid( "6d746f8d-b837-4365-afa1-fcab8c0d12c5" ), new AllColumns() );
-			Console.WriteLine( "TestRetrieveDynamic() found: " + de.Properties[ "address1_name" ] );
-		}
 
 		public static void Main() {
 			Fest.Run();
 			Console.ReadLine();
-		}
-
-		[FestTest]
-		public void TestUpdate() {
-			MockCrmService serviceFromDisk = new MockCrmService( "database.xml", true );
-			DynamicEntity de = new DynamicEntity( "contact" );
-			de.Properties.Add( new KeyProperty( "contactid", new Key( new Guid( "6d746f8d-b837-4365-afa1-fcab8c0d12c5" ) ) ) );
-			de.Properties.Add( new StringProperty( "address1_name", "Susan" ) );
-			serviceFromDisk.Update( de );
-
-			DynamicEntity de2 = ( DynamicEntity )serviceFromDisk.Retrieve( "contact", new Guid( "6d746f8d-b837-4365-afa1-fcab8c0d12c5" ), new AllColumns() );
-			Fest.AssertTrue( ( String )de2.Properties[ "address1_name" ] == "Susan", "Field value was not updated" );
-		}
-
-		[FestTest]
-		public void TestMockData() {
-			MockCrmService serviceFromDisk = new MockCrmService( "mockdata.xml" );
-			QueryBase query = CrmQuery
-				.Select()
-				.From( "new_dynamicform" )
-				.Join( "new_dynamicform", "new_previousformid", "new_dynamicform", "new_dynamicformid" )
-				.Where( "new_dynamicform", "new_name", ConditionOperator.Equal, new object[] { "welcome" } ).Query;
-			BusinessEntityCollection bec = serviceFromDisk.RetrieveMultiple( query );
-			Console.WriteLine( "TestMockData() found: " + bec.BusinessEntities.Count + " entity. " );
-			Fest.AssertTrue( bec.BusinessEntities.Count > 0, "No business entities returned" );
-		}
-
-		// [FestTest]
-		public void Test1() {
-			// TODO: add test for delete back
-			// service.Delete( "contact", id );
-
-			MockCrmService service = Setup();
-			MockCrmService serviceFromDisk = new MockCrmService( "database.xml" );
-			
-
-			TestLinks( service );
-			TestLinks( serviceFromDisk );
-			TestFilters( service );
-			TestFilters( serviceFromDisk );
-
-			// TestRetrieve();
-			// m_service.PersistToDisk( "database.xml" );
 		}
 	}
 }
