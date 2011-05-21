@@ -56,8 +56,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\CrmQuery.dll</HintPath>
     </Reference>
-    <Reference Include="Fest">
-      <HintPath>..\..\..\assemblycache\Fest\0.2.0.0\3.5\Release\Fest.dll</HintPath>
+    <Reference Include="Fest, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Fest.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Xrm.Sdk">
       <HintPath>..\MockCrm5Service\lib\Microsoft.Xrm.Sdk.dll</HintPath>
