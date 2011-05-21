@@ -55,6 +55,10 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Djn.Framework, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Djn.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Xrm.Sdk">
       <HintPath>lib\Microsoft.Xrm.Sdk.dll</HintPath>
     </Reference>
@@ -100,12 +104,6 @@
     <Compile Include="MockCrmService.cs" />
     <Compile Include="MockCrmServiceExperimental.cs" />
     <Compile Include="SerializableDictionary.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Djn.Framework\Djn.Framework.csproj">
-      <Project>{F4E1CF02-D973-422C-AC1B-EDC90B6D5216}</Project>
-      <Name>Djn.Framework</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

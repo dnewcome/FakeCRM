@@ -16,67 +16,37 @@ namespace Djn.Testing
 		public Program() {
             
 			m_service = new MockCrmService();
-			/*
-            contact contact = new contact();
-			contact.address1_name = "Dan";
-			contact.address1_city = "Bethesda";
-			Guid id = m_service.Create( contact );
-
-			// data for testing links
-			subject subject1 = new subject();
-			subject1.title = "parent";
-			Guid subject1ID = m_service.Create( subject1 );
-			subject subject2 = new subject();
-			subject2.title = "child";
-			subject2.parentsubject = new Lookup( "subject", subject1ID );
-			m_service.Create( subject2 );
-            */
-
+			
+			// test data for simple fetch
 			Entity de = new Entity();
 			de.LogicalName = "mydynamic";
 			de["prop1"] = "foo";
 			Guid deID = m_service.Create( de );
+
+			// test data for filters
+			de = new Entity();
+			de.LogicalName = "contact";
+			de[ "address1_name" ] = "Dan";
+			de[ "address1_city" ] = "Bethesda";
+			Guid deID2 = m_service.Create( de );
+
+			// data for testing links
+			Guid guid = Guid.NewGuid();
+			de = new Entity();
+			de.LogicalName = "subject";
+			de[ "subjectid" ] = guid;
+			Guid deID3 = m_service.Create( de );
+
+			de = new Entity();
+			de.LogicalName = "subject";
+			de[ "subjectid" ] = guid;
+			de[ "title" ] = "child";
+			de[ "parentsubject" ] = new EntityReference( "subject", deID3 );
+			Guid deID4 = m_service.Create( de );
 		}
 
-        /*
 		[FestTest]
-		public void TestFilters() {
-			ConditionExpression cond = new ConditionExpression( "address1_name", ConditionOperator.Equal, new string[] { "Dan" } );
-			ConditionExpression cond2 = new ConditionExpression( "address1_city", ConditionOperator.Equal, new string[] { "Bethesda" } );
-			FilterExpression fe = new FilterExpression();
-			fe.FilterOperator = LogicalOperator.And;
-			fe.Conditions.Add( cond );
-			fe.Conditions.Add( cond2 );
-
-			QueryExpression qe = new QueryExpression( "contact" );
-			qe.Criteria = fe;
-
-			BusinessEntityCollection bec = m_service.RetrieveMultiple( qe );
-			Console.WriteLine( "TestFilters() found: " + bec.BusinessEntities.Count + " entity. " );
-			Fest.AssertTrue( bec.BusinessEntities.Count > 0, "found more than zero entities" );
-		}
-
-		[FestTest]
-		public void TestLinks() {
-			ConditionExpression cond = new ConditionExpression( "title", ConditionOperator.Equal, new string[] { "child" } );
-			FilterExpression fe = new FilterExpression();
-			fe.FilterOperator = LogicalOperator.And;
-			fe.Conditions.Add( cond );
-
-			LinkEntity le = new LinkEntity( "subject", "subject", "subjectid", "parentsubject", JoinOperator.Inner );
-			le.LinkCriteria = fe;
-
-			QueryExpression qe = new QueryExpression( "subject" );
-			qe.LinkEntities.Add( le );
-
-			BusinessEntityCollection bec = m_service.RetrieveMultiple( qe );
-			Console.WriteLine( "TestLinks() found: " + bec.BusinessEntities.Count + " entity. " );
-			Fest.AssertTrue( bec.BusinessEntities.Count > 0, "found more than zero entities" );
-		}
-        */
-
-		[FestTest]
-		public void TestDynamic() {
+		public void TestSingleFilter() {
 			QueryBase query = CrmQuery
 				.Select()
 				.From( "mydynamic" )
@@ -86,6 +56,29 @@ namespace Djn.Testing
 			Fest.AssertTrue( bec.Entities.Count > 0, "found more than zero entities" );
 		}
 
+		[FestTest]
+		public void TestMultipleFilters() {
+			QueryBase query = CrmQuery
+				.Select()
+				.From( "contact" )
+				.Where( "contact", "address1_name", ConditionOperator.Equal, new object[] { "Dan" } )
+				.Where( "contact", "address1_city", ConditionOperator.Equal, new object[] { "Bethesda" } ).Query;
+
+			EntityCollection bec = m_service.RetrieveMultiple( query );
+			Fest.AssertTrue( bec.Entities.Count > 0, "found more than zero entities" );
+		}
+		
+		[FestTest]
+		public void TestLinks() {
+			QueryBase query = CrmQuery
+				.Select()
+				.From( "subject" )
+				.Join( "subject", "subjectid", "subject", "parentsubject" )
+				.Where( "subject", "title", ConditionOperator.Equal, new object[] { "child" } ).Query;
+
+			EntityCollection bec = m_service.RetrieveMultiple( query );
+			Fest.AssertTrue( bec.Entities.Count > 0, "found more than zero entities" );
+		}
 
 		public static void Main() {
 			Fest.Run();

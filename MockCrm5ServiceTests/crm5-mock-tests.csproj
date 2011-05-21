@@ -52,6 +52,10 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CrmQuery, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\CrmQuery.dll</HintPath>
+    </Reference>
     <Reference Include="Fest">
       <HintPath>..\..\..\assemblycache\Fest\0.2.0.0\3.5\Release\Fest.dll</HintPath>
     </Reference>
@@ -111,10 +115,6 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CrmQuery\CrmQuery\CrmQuery.csproj">
-      <Project>{D6354AB3-36AB-480A-830B-834064FC02BB}</Project>
-      <Name>CrmQuery</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MockCrm5Service\crm5-mock.csproj">
       <Project>{BA441DB1-CCC1-40F0-B1F9-9616588A7F61}</Project>
       <Name>crm5-mock</Name>

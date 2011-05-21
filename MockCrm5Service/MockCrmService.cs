@@ -123,7 +123,7 @@ namespace Djn.Testing
 			foreach( Entity entity in data[ entityName ].Entities ) {
 				// TODO: factor this check out to method	
 				Guid key;
-				if( entity.GetType().Name == "DynamicEntity" ) {
+				if( entity.GetType().Name == "Entity" ) {
 					Entity de = ( Entity )entity;
 					key = ( Guid )de[ entityName + "id" ];
 				}
@@ -190,7 +190,7 @@ namespace Djn.Testing
 					object linkFromFieldValue = null;
 					object linkToFieldValue = null;
 					try { // another hack, since some entities will have null on the field we are linking
-						if( entity.GetType().Name == "DynamicEntity" ) {
+						if( entity.GetType().Name == "Entity" ) {
 							// TODO: we only support StringProperty here
 							linkFromFieldValue = ( ( Entity )in_entity )[ link.LinkFromAttributeName ];
 							linkToFieldValue = ( ( Entity )entity )[ link.LinkToAttributeName ];
