@@ -80,9 +80,7 @@ namespace Djn.Testing
 			if( request.GetType().Name == "RetrieveMultipleRequest" ) {
 				RetrieveMultipleResponse response = new RetrieveMultipleResponse();
 			    EntityCollection result = RetrieveMultiple( ( ( RetrieveMultipleRequest )request ).Query );
-                foreach( Entity entity in result.Entities ) {
-                    response.EntityCollection.Entities.Add(entity);
-                }
+				response.Results[ "EntityCollection" ] = result;
 				return response;
 			}
 			else if(request.GetType().Name == "RetrieveRequest" ) {
@@ -272,11 +270,12 @@ namespace Djn.Testing
 			}
 
 			bool retval;
-			if( in_filter.FilterOperator == LogicalOperator.And ) {
-				retval = true;
+			// changed to default to true where no filters are present
+			if( in_filter.FilterOperator == LogicalOperator.Or ) {
+				retval = false;
 			}
 			else {
-				retval = false;
+				retval = true;
 			}
 			foreach( bool result in results ) {
 				if( in_filter.FilterOperator == LogicalOperator.And ) {
