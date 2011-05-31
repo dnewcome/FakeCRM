@@ -24,9 +24,13 @@ namespace Djn.Testing
 
 		public void ReadFromDisk( string in_filename ) {
 			Type type = typeof( SerializableDictionary<string, EntityCollection> );
-			FileStream fs = new FileStream( in_filename, FileMode.Open, FileAccess.Read );
-			data = ( SerializableDictionary<string, EntityCollection> )Serializer.Deserialize( type, fs );
-			fs.Close();
+			// not sure if this behavior is good - we read file if it exists, otherwise we 
+			// don't worry about it.
+			if( File.Exists( in_filename ) ) {
+				FileStream fs = new FileStream( in_filename, FileMode.Open, FileAccess.Read );
+				data = ( SerializableDictionary<string, EntityCollection> )Serializer.Deserialize( type, fs );
+				fs.Close();
+			}
 		}
 
 	} // class
