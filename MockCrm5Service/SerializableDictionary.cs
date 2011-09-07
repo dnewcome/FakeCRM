@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
@@ -43,7 +44,12 @@ public class SerializableDictionary<TKey, TValue>
 
 	public void WriteXml( System.Xml.XmlWriter writer ) {
 		XmlSerializer keySerializer = new XmlSerializer( typeof( TKey ) );
-		XmlSerializer valueSerializer = new XmlSerializer( typeof( TValue ) );
+		// XmlSerializer valueSerializer = new XmlSerializer( typeof( TValue ) );
+
+		DataContractSerializer serializer =
+			new DataContractSerializer( typeof( TValue ), null, int.MaxValue, false, false, null, new Microsoft.Xrm.Sdk.KnownTypesResolver() );
+		
+		
 
 		foreach( TKey key in this.Keys ) {
 			writer.WriteStartElement( "item" );
@@ -54,7 +60,14 @@ public class SerializableDictionary<TKey, TValue>
 
 			writer.WriteStartElement( "value" );
 			TValue value = this[ key ];
-			valueSerializer.Serialize( writer, value );
+			// valueSerializer.Serialize( writer, value );
+			serializer.WriteObject( writer, value );
+			
+			
+
+
+
+
 			writer.WriteEndElement();
 
 			writer.WriteEndElement();

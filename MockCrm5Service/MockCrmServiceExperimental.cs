@@ -19,6 +19,7 @@ namespace Djn.Testing
 			Type type = typeof( SerializableDictionary<string, EntityCollection> );
 			FileStream fs = new FileStream( in_filename, FileMode.Create, FileAccess.Write );
 			Serializer.Serialize( type, data, fs );
+			ContractSerializer.Serialize( type, data, fs, new Microsoft.Xrm.Sdk.KnownTypesResolver() );
 			fs.Close();
 		}
 
@@ -28,8 +29,14 @@ namespace Djn.Testing
 			// don't worry about it.
 			if( File.Exists( in_filename ) ) {
 				FileStream fs = new FileStream( in_filename, FileMode.Open, FileAccess.Read );
-				data = ( SerializableDictionary<string, EntityCollection> )Serializer.Deserialize( type, fs );
-				fs.Close();
+				try {
+					data = ( SerializableDictionary<string, EntityCollection> )ContractSerializer.Deserialize( type, fs, new Microsoft.Xrm.Sdk.KnownTypesResolver() );
+				}
+				catch { 
+					
+				}
+				finally { fs.Close(); }
+				
 			}
 		}
 
