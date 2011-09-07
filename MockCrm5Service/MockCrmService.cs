@@ -107,6 +107,17 @@ namespace Djn.Testing
 				}
 				return response;
 			}
+			else if( request.GetType().Name == "CreateRequest" ) { 
+				CreateResponse response = new CreateResponse();
+			    Guid result = Create( ( ( CreateRequest )request ).Target );
+				response.Results[ "id" ] = result;
+				return response;
+			}
+			else if( request.GetType().Name == "UpdateRequest" ) {
+				UpdateResponse response = new UpdateResponse();
+				Update( ( ( UpdateRequest )request).Target );
+				return response;
+			}
 			else {
 				throw new NotImplementedException();
 			}
