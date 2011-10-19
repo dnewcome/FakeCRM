@@ -31,8 +31,10 @@ namespace Djn.Testing
         public void Disassociate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities) { }       
 
 		public Guid Create( Entity entity ) {
+			// TODO: can the ID be assigned manually? I can't remember
 			Guid id = Guid.NewGuid();
-			
+			entity.Id = id;
+
 			string name = entity.GetType().Name;
 			if( data.ContainsKey( name ) == false ) {
 				data.Add( name, new EntityCollection() );
