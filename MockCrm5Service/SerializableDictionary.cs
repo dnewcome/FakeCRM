@@ -15,7 +15,8 @@ public class SerializableDictionary<TKey, TValue>
 
 	public void ReadXml( System.Xml.XmlReader reader ) {
 		XmlSerializer keySerializer = new XmlSerializer( typeof( TKey ) );
-		XmlSerializer valueSerializer = new XmlSerializer( typeof( TValue ) );
+		// XmlSerializer valueSerializer = new XmlSerializer( typeof( TValue ) );
+		
 
 		bool wasEmpty = reader.IsEmptyElement;
 		reader.Read();
@@ -31,7 +32,11 @@ public class SerializableDictionary<TKey, TValue>
 			reader.ReadEndElement();
 
 			reader.ReadStartElement( "value" );
-			TValue value = ( TValue )valueSerializer.Deserialize( reader );
+			System.Runtime.Serialization.DataContractSerializer serializer =
+			new System.Runtime.Serialization.DataContractSerializer( typeof( TValue ), null, int.MaxValue, false, false, null, new Microsoft.Xrm.Sdk.KnownTypesResolver() );
+			TValue value = (TValue)serializer.ReadObject( reader );
+
+
 			reader.ReadEndElement();
 
 			this.Add( key, value );
