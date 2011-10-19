@@ -22,7 +22,9 @@ namespace Djn.Testing
 
 		public MockCrmService( string in_filename ) {
 			m_filename = in_filename;
-			ReadFromDisk( in_filename );
+			if( System.IO.File.Exists( in_filename ) ) {
+				ReadFromDisk( in_filename );
+			}
 		}
 
 		public MockCrmService() { }
@@ -104,6 +106,9 @@ namespace Djn.Testing
 
 		// Note: we ignore columnset
 		public BusinessEntity Retrieve( string entityName, Guid id, Microsoft.Crm.Sdk.Query.ColumnSetBase columnSet ) {
+			if( !data.ContainsKey( entityName ) ) {
+				throw new Exception( "Entity " + entityName + " not defined in the data store" );
+			}
 			foreach( BusinessEntity entity in data[ entityName ].BusinessEntities ) {
 				// TODO: factor this check out to method	
 				Key key;
