@@ -18,7 +18,10 @@ namespace Djn.Testing
 		public void PersistToDisk( string in_filename ) {
 			Type type = typeof( SerializableDictionary<string, EntityCollection> );
 			FileStream fs = new FileStream( in_filename, FileMode.Create, FileAccess.Write );
-			Serializer.Serialize( type, data, fs );
+			
+			// TODO: previously I thought that we had to use a DataContracSerializer for this.
+			// However the old serializer appears to work also. Should investigate this.
+			// Serializer.Serialize( type, data, fs );
 			ContractSerializer.Serialize( type, data, fs, new Microsoft.Xrm.Sdk.KnownTypesResolver() );
 			fs.Close();
 		}
@@ -30,10 +33,8 @@ namespace Djn.Testing
 			if( File.Exists( in_filename ) ) {
 				FileStream fs = new FileStream( in_filename, FileMode.Open, FileAccess.Read );
 				try {
-					data = ( SerializableDictionary<string, EntityCollection> )ContractSerializer.Deserialize( type, fs, new Microsoft.Xrm.Sdk.KnownTypesResolver() );
-				}
-				catch { 
-					
+					Microsoft.Xrm.Sdk.KnownTypesResolver resolver = new Microsoft.Xrm.Sdk.KnownTypesResolver();
+					data = ( SerializableDictionary<string, EntityCollection> )ContractSerializer.Deserialize( type, fs, resolver );
 				}
 				finally { fs.Close(); }
 				
