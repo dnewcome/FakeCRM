@@ -5,6 +5,8 @@ using System.Web;
 using System.Web.Services;
 using Microsoft.Crm.Sdk;
 using Microsoft.Crm.Sdk.Query;
+using Microsoft.Crm.SdkTypeProxy;
+
 using Djn.Testing;
 
 [WebService( Namespace = "http://schemas.microsoft.com/crm/2007/WebServices" )]
@@ -12,7 +14,7 @@ using Djn.Testing;
 // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
 // [System.Web.Script.Services.ScriptService]
 
-public class Service : System.Web.Services.WebService, ICrmService
+public class Service : System.Web.Services.WebService//, ICrmService
 {
 	static Service() {
 		string file = System.Configuration.ConfigurationSettings.AppSettings.Get( "datafile" );
@@ -34,9 +36,22 @@ public class Service : System.Web.Services.WebService, ICrmService
 		m_service.Delete( entityName, id );
 	}
 
+	/**
+	* Execute has been problematic. The first problem was that we had to rename the 
+	* argument from 'request' to 'Request' in order to avoid getting a null value.
+	* Also the data type needed to be changed to 'Request' and not 'object'. Note that
+	* this is different than ICrmService so we can no longer implement that interface.
+	* We need to return type 'Response' in order to avoid XML parsing errors. Serialization
+	* won't work without this. However, even still, I'm getting null return values 
+	* back on the client side. There are results here in the webservice and they are getting
+	* parsed, but somehow the data is still getting lost.
+	* I've switched back to using the service in-proc instead of using this service for now.
+	*/
 	[WebMethod( Description = "http://schemas.microsoft.com/crm/2007/WebServices/Execute" )]
-	public object Execute( object request ) {
-		return m_service.Execute( request );
+	public Response Execute( Request Request ) {
+		Response res = (Response)m_service.Execute( Request );
+		// object res = m_service.Execute( Request );
+		return res;
 	}
 	[WebMethod( Description = "http://schemas.microsoft.com/crm/2007/WebServices/Retrieve" )]
 	public BusinessEntity Retrieve( string entityName, Guid id, ColumnSetBase columnSet ) {
